@@ -1,0 +1,12 @@
+/.bundle/
+/vendor/
+/pkg/
+*.gem
+*.rbc
+.rspec_status
+coverage/
+.env.local
+.byebug_history
+.sorbet/
+.solargraph-cache.yml
+log/*

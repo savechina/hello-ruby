@@ -1,0 +1,7 @@
+app_name: hello_ruby
+version: 0.1.0
+log_level: info
+
+database:
+  adapter: sqlite3
+  database: db/hello_ruby.sqlite3

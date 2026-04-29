@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -e
+
+# Change to project root directory
+cd "$(dirname "$0")/.."
+
+# Install gem dependencies
+bundle install
+
+echo "Bundle install complete!"
