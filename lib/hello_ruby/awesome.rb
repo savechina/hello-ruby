@@ -4,11 +4,11 @@
 # 加载 awesome 层级的示例
 # Awesome 层包含生产级 Web 框架和异步任务示例
 
-require_relative "../hello/awesome/sinatra_demo"
-require_relative "../hello/awesome/hanami_demo"
-require_relative "../hello/awesome/grape_demo"
-require_relative "../hello/awesome/sidekiq_demo"
-require_relative "../hello/awesome/falcon_demo"
+require_relative "../hello/awesome/sinatra_sample"
+require_relative "../hello/awesome/hanami_sample"
+require_relative "../hello/awesome/grape_sample"
+require_relative "../hello/awesome/sidekiq_sample"
+require_relative "../hello/awesome/falcon_sample"
 
 module Hello
   module Awesome
