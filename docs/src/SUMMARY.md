@@ -42,6 +42,11 @@
 # 实战精选 (Awesome)
 
 - [实战精选](./awesome/awesome-overview.md)
+    - [Sinatra 微框架](./awesome/sinatra.md) — FastAPI/Flask 等价物
+    - [Hanami 干净架构](./awesome/hanami.md) — 现代 Ruby 全栈框架
+    - [Grape REST API](./awesome/grape.md) — 版本化、参数验证、OpenAPI
+    - [Sidekiq 后台任务](./awesome/sidekiq.md) — Redis 队列、幂等性、重试策略
+    - [Falcon 异步服务器](./awesome/falcon.md) — HTTP/2、WebSocket、高并发
 
 # 附录
 
