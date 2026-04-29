@@ -2,9 +2,58 @@
 
 ## 安装 Ruby
 
-首先，你需要安装 Ruby 3.2 或更高版本。推荐使用 `rbenv` 或 `mise` 来管理 Ruby 版本，这样可以在不同项目之间灵活切换。
+首先，你需要安装 Ruby 3.2 或更高版本。推荐使用 `rv`（Ruby Version manager）来管理 Ruby 版本，它比传统的 `rbenv` 更快更现代化。你也可以选择 `mise` 统一管理多语言版本。
 
-### macOS 安装
+### rv 安装（推荐）
+
+`rv` 是一个极速的 Ruby 版本和项目管理器，用 Rust 编写。它不仅能管理 Ruby 版本，还能隔离管理项目 gems，性能远超 rbenv/asdf。
+
+macOS 用户可以使用 Homebrew 安装：
+
+```bash
+$ brew install rv
+
+# 设置自动版本切换 Shell 集成
+$ rv shell zsh  # 或 bash / fish / nu
+
+# 安装 Ruby 3.2
+$ rv ruby install 3.2.1
+
+# 验证安装
+$ ruby --version
+# ruby 3.2.1
+```
+
+Linux 用户可通过 Homebrew Linux 或独立安装脚本：
+
+```bash
+# 方式一：Homebrew
+$ brew install rv
+
+# 方式二：独立脚本
+$ curl -LsSf https://rv.dev/install | sh
+
+# 安装 Ruby 3.2
+$ rv ruby install 3.2.1
+$ ruby --version
+```
+
+Windows 用户（PowerShell 管理员模式）：
+
+```powershell
+> powershell -ExecutionPolicy Bypass -c "irm https://rv.dev/install.ps1 | iex"
+# 注意：Windows 上使用 rvw 代替 rv（rv 是 PowerShell 内置别名）
+> rvw ruby install 3.2.1
+```
+
+`rv` 的核心功能：
+- **极速运行**：`rv run ruby` 或 `rvx rails new .` 直接运行任何 Ruby 命令
+- **自动版本切换**：进入目录自动切换 `.ruby-version` 指定的版本
+- **隔离 gem 环境**：`rv clean-install` 从 Gemfile.lock 隔离安装项目 gems
+- **CLI 工具管理**：`rv tool install` 在独立环境中安装 gem CLI 工具
+- **跨平台**：原生支持 macOS / Linux / Windows
+
+### 备选：rbenv 安装
 
 macOS 用户可以使用 Homebrew 安装 rbenv：
 
@@ -22,6 +71,8 @@ $ ruby --version
 # ruby 3.2.1
 ```
 
+### 备选：mise 安装
+
 或者使用 `mise`（推荐，统一管理多语言版本）：
 
 ```bash
@@ -32,7 +83,18 @@ $ ruby --version
 
 ### Linux 安装
 
-Linux 用户也可以使用 rbenv 安装 Ruby：
+Linux 用户也可以使用 `rv` 安装：
+
+```bash
+# 通过独立脚本
+$ curl -LsSf https://rv.dev/install | sh
+$ rv shell zsh
+
+$ rv ruby install 3.2.1
+$ ruby --version
+```
+
+或使用 `rbenv` / `asdf` 作为替代：
 
 ```bash
 $ git clone https://github.com/rbenv/rbenv.git ~/.rbenv
@@ -45,14 +107,24 @@ $ rbenv global 3.2.1
 
 ### Windows 安装
 
-Windows 用户推荐使用 **WSL2**（Windows Subsystem for Linux）安装 Ubuntu，然后按照 Linux 步骤安装 Ruby。也可以使用 [RubyInstaller](https://rubyinstaller.org/) 项目直接安装。
+Windows 用户推荐使用 **WSL2**（Windows Subsystem for Linux）安装 Ubuntu，然后在 WSL2 中安装 `rv`：
 
 ```bash
 # 在 WSL2 的 Ubuntu 中
-$ rbenv install 3.2.1
-$ rbenv global 3.2.1
+$ curl -LsSf https://rv.dev/install | sh
+$ rv shell zsh
+$ rv ruby install 3.2.1
 $ ruby --version
 ```
+
+也可以直接使用 Windows 原生安装（PowerShell 管理员模式）：
+
+```powershell
+> powershell -ExecutionPolicy Bypass -c "irm https://rv.dev/install.ps1 | iex"
+> rvw ruby install 3.2.1
+```
+
+> **注意**：Windows PowerShell 中 `rv` 是 `Remove-Variable` 的内置别名，需使用 `rvw` 代替。也可以使用 [RubyInstaller](https://rubyinstaller.org/) 项目直接安装。
 
 ## 克隆并设置项目
 
