@@ -54,31 +54,36 @@ module Hello
         puts "--- 2. Dir 目录操作 ---"
 
         # 当前工作目录
-        puts "Dir.pwd: #{Dir.pwd}"
+        rb_dir = File.join(Hello::ROOT, "lib", "hello_ruby")
 
-        # 获取当前目录下的 .rb 文件
-        puts "当前目录下的 .rb 文件:"
-        Dir.glob("*.rb").each do |f|
-          puts "  #{f}"
+        puts "Dir.pwd: #{Dir.pwd}"
+        puts
+
+        # Dir.glob — 单级匹配
+        puts "\n当前目录下的 .rb 文件:"
+        Dir.glob(File.join(rb_dir, "*.rb")).each do |f|
+          puts "  #{File.basename(f)}"
         end
 
-        # 递归查找所有 .rb 文件（** 表示递归）
-        rb_count = Dir.glob("**/*.rb").length
+        # Dir.glob("**/*.rb") — 递归匹配
+        rb_count = Dir.glob(File.join(rb_dir, "**", "*.rb")).length
         puts "项目中 .rb 文件总数: #{rb_count}"
 
-        # 匹配多种扩展名（花括号扩展）
-        all_docs = Dir.glob("**/*.{rb,md}")
-        puts "Ruby + Markdown 文件总数: #{all_docs.length}"
+        # 多扩展名模式
+        all_docs = Dir.glob(File.join(rb_dir, "**", "*.{rb,md}")).length
+        puts "Ruby + Markdown 文件总数: #{all_docs}"
+
+        basic_dir = File.join(Hello::ROOT, "lib", "hello_ruby", "basic")
 
         # Dir.entries — 列出目录所有内容（包含 . 和 ..）
         puts "\nDir.entries('lib/hello_ruby/basic'):"
-        Dir.entries("lib/hello_ruby/basic").each do |entry|
+        Dir.entries(basic_dir).each do |entry|
           puts "  #{entry}"
         end
 
         # Dir.each_child — 迭代子目录/文件（不包含 . 和 ..）
         puts "\nDir.each_child('lib/hello_ruby/basic'):"
-        Dir.each_child("lib/hello_ruby/basic") do |child|
+        Dir.each_child(basic_dir) do |child|
           puts "  #{child}"
         end
 
