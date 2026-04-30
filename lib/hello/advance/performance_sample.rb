@@ -2,6 +2,8 @@
 # frozen_string_literal: true
 
 require "benchmark"
+require "benchmark/ips"
+require "memory_profiler"
 require "objspace"
 
 module Hello
@@ -162,7 +164,120 @@ module Hello
         end
         puts "  预分配减少动态扩容"
         puts
+
+        # --- 11. benchmark-ips 高精度测量 ---
+        benchmark_ips_demo
+
+        # --- 12. 内存分析器 ---
+        memory_profiler_demo
+
+        # --- 13. ObjectSpace 深度分析 ---
+        objectspace_deep_analysis
+
+        # --- 14. GC 调优 ---
+        gc_tuning_examples
+
         puts "=== 性能优化演示完成 ==="
+      end
+
+      def self.benchmark_ips_demo
+        puts "--- Benchmark.ips — 高精度迭代/秒测量 ---"
+        puts
+
+        puts "  比较: 字符串拼接方式 (iterations per second)"
+        Benchmark.ips do |x|
+          x.report("+=") { (1..1000).to_a.reduce("") { |s, i| s + i.to_s } }
+          x.report("<<") { (1..1000).to_a.reduce(String.new) { |s, i| s << i.to_s } }
+          x.report("join") { (1..1000).map(&:to_s).join }
+          x.compare!
+        end
+        puts
+
+        puts "  比较: Hash 查找方式"
+        small_hash = Hash[(1..100).map { |i| [i, "val_#{i}"] }]
+        array = (1..100).to_a
+
+        Benchmark.ips do |x|
+          x.report("Hash[]") { small_hash[50] }
+          x.report("Array#find") { array.find { |i| i == 50 } }
+          x.compare!
+        end
+        puts
+      end
+
+      def self.memory_profiler_demo
+        puts "--- MemoryProfiler — 内存分配追踪 ---"
+        puts
+
+        report = MemoryProfiler.report do
+          1000.times do |i|
+            "hello_#{i}_world".split("_").map(&:upcase).join("-")
+          end
+        end
+
+        report.pretty_print(scale_bytes: true, normalize_paths: true)
+        puts
+
+        total_allocated = report.total_allocated_memsize
+        puts "  总分配大小: #{(total_allocated / 1024.0).round(2)} KB"
+        puts
+      end
+
+      def self.objectspace_deep_analysis
+        puts "--- ObjectSpace — 深度对象分析 ---"
+        puts
+
+        puts "  各类对象数量 Top 15:"
+        counts = {}
+        ObjectSpace.each_object { |obj|
+          klass = obj.class rescue Object
+          counts[klass.name || "<anonymous>"] ||= 0
+          counts[klass.name || "<anonymous>"] += 1
+        }
+
+        sorted = counts.sort_by { |_, v| -v }.take(15)
+        sorted.each do |name, count|
+          puts "    #{name.ljust(30)} #{count}"
+        end
+        puts
+
+        puts "  Symbol 总数: #{Symbol.all_symbols.size}"
+        GC.start
+        puts "  GC 后存活对象: #{ObjectSpace.count_objects[:TOTAL]}"
+        puts
+      end
+
+      def self.gc_tuning_examples
+        puts "--- GC.configure — 调优示例 ---"
+        puts
+
+        params = GC::OPTS.select { |opt| opt.to_s.include?("max") || opt.to_s.include?("min") }
+        puts "  GC 配置参数:"
+        params.each do |opt|
+          begin
+            val = GC.const_get(opt)
+            puts "    #{opt.to_s.ljust(35)} => #{val}"
+          rescue NameError
+            nil
+          end
+        end
+        puts
+
+        gc_before = GC.stat
+        puts "  调优前: heap_live_slots=#{gc_before[:heap_live_slots]}, heap_free_slots=#{gc_before[:heap_free_slots]}"
+
+        GC.disable
+        100_000.times { Array.new(10) }
+        gc_during = GC.stat
+        puts "  禁用 GC 分配后: heap_live_slots=#{gc_during[:heap_live_slots]}, heap_free_slots=#{gc_during[:heap_free_slots]}"
+
+        GC.enable
+        GC.start
+        gc_after = GC.stat
+        puts "  启用 GC 后:   heap_live_slots=#{gc_after[:heap_live_slots]}, heap_free_slots=#{gc_after[:heap_free_slots]}"
+        puts
+        puts "  结论: 合理调整 GC 参数可减少不必要的回收停顿"
+        puts
       end
     end
   end

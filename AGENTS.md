@@ -30,7 +30,7 @@ Beginner-friendly Ruby fundamentals. Each topic is a self-contained module in `l
 | 14 | Regular Expressions | `basic/regex_sample.rb` | ✅ Initial |
 | 15 | File Management | `basic/file_management_sample.rb` | ✅ Initial |
 
-### Advance Tier (10 Topics)
+### Advance Tier (15 Topics)
 
 Intermediate to advanced Ruby concepts and ecosystem tools.
 
@@ -45,7 +45,12 @@ Intermediate to advanced Ruby concepts and ecosystem tools.
 | 7 | DI with dry-system | `advance/dry_system.rb` | ✅ Initial |
 | 8 | CLI Advanced | `advance/cli_advanced.rb` | ✅ Initial |
 | 9 | Threads & Fibers | `advance/threads_fibers.rb` | ✅ Initial |
-| 10 | Performance | `advance/performance.rb` | ✅ Initial |
+| 10 | Performance | `advance/performance_sample.rb` | ✅ Expanded |
+| 11 | LLM Integration | `advance/llm_sample.rb` | ✅ 002-hello-advance-tutorials |
+| 12 | System Programming | `advance/system_programming_sample.rb` | ✅ 002-hello-advance-tutorials |
+| 13 | Memory Mapping | `advance/memory_mapping_sample.rb` | ✅ 002-hello-advance-tutorials |
+| 14 | Parallel Computing | `advance/parallel_sample.rb` | ✅ 002-hello-advance-tutorials |
+| 15 | Data Processing | `advance/data_processing_sample.rb` | ✅ 002-hello-advance-tutorials |
 
 ### Awesome Tier (Production Grade)
 
