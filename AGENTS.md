@@ -255,6 +255,8 @@ end
 ## Active Technologies
 - Ruby 3.2+ (rbenv managed, per .ruby-version) (001-hello-basic-tutorials)
 - SQLite3 (in-memory for examples, file-based for Awesome tier database simulations) (001-hello-basic-tutorials)
+- Ruby 3.2+ (rbenv managed per .ruby-version) + Thor ~> 1.1 (CLI), dry-system (DI), ruby-openai >= 6.0, parallel >= 1.22, mmap >= 1.0, benchmark-ips >= 2.10, memory_profiler >= 1.0, sys-proctable >= 1.0, dotenv ~> 3.0 (002-hello-advance-tutorials)
+- SQLite3 in-memory (existing), spec/fixtures/ for sample data files (002-hello-advance-tutorials)
 
 ## Recent Changes
 - 001-hello-basic-tutorials: Added Ruby 3.2+ (rbenv managed, per .ruby-version)

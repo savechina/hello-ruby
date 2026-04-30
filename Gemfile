@@ -17,6 +17,15 @@ group :development do
   gem "ruby-lsp"
   gem "solargraph"
   gem "debug"
+
+  # Optional gems for advance tier examples
+  gem "ruby-openai", ">= 6.0"
+  gem "sys-proctable", ">= 1.0"
+  gem "parallel", ">= 1.22"
+  gem "benchmark-ips", ">= 2.10"
+  gem "memory_profiler", ">= 1.0"
+  gem "dotenv", "~> 3.0"
+  # mmap-ruby requires Ruby >= 3.3.0; install manually if using Ruby 3.3+
 end
 
 gem "faker", "~> 3.5"
