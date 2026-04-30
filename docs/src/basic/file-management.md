@@ -84,12 +84,12 @@ all_docs = Dir.glob("**/*.{rb,md}")
 puts "Ruby + Markdown 文件总数: #{all_docs.length}"
 
 # Dir.entries — 列出目录所有内容（含 . 和 ..）
-puts "Dir.entries('lib/hello_ruby/basic'):"
-Dir.entries("lib/hello_ruby/basic").each { |entry| puts "  #{entry}" }
+puts "Dir.entries('lib/hello/basic'):"
+Dir.entries("lib/hello/basic").each { |entry| puts "  #{entry}" }
 
 # Dir.each_child — 迭代子目录/文件（不含 . 和 ..）
-puts "Dir.each_child('lib/hello_ruby/basic'):"
-Dir.each_child("lib/hello_ruby/basic") { |child| puts "  #{child}" }
+puts "Dir.each_child('lib/hello/basic'):"
+Dir.each_child("lib/hello/basic") { |child| puts "  #{child}" }
 ```
 
 ## FileTest — 文件属性检查
@@ -132,9 +132,9 @@ puts "  .ascend:   #{pn.ascend.to_a}"
 
 # / 运算符拼接路径（比 File.join 更优雅）
 project_root = Pathname.new(".")
-lib_path = project_root / "lib" / "hello_ruby.rb"
+lib_path = project_root / "lib" / "hello.rb"
 puts "\nPathname / 运算符:"
-puts "  lib/hello_ruby.rb 路径: #{lib_path}"
+puts "  lib/hello.rb 路径: #{lib_path}"
 puts "  存在？#{lib_path.exist?}"
 
 # 读取文件内容
@@ -160,7 +160,7 @@ puts "  #{absolute} 相对 /usr/local 是: #{relative}"
 ## 临时目录 — Dir.mktmpdir
 
 ```ruby
-Dir.mktmpdir("hello_ruby_") do |tmp_dir|
+Dir.mktmpdir("hello_") do |tmp_dir|
   tmp_path = Pathname.new(tmp_dir)
   puts "创建临时目录: #{tmp_dir}"
 

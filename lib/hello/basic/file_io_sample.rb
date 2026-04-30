@@ -104,4 +104,4 @@ module Hello
   end
 end
 
-Hello::TopicRegistry.register("basic", "file_io_sample", "文件 I/O", Hello::Basic::FileIOSample)
+Hello::TopicRegistry.register("basic", "file_io", "文件 I/O", Hello::Basic::FileIOSample)

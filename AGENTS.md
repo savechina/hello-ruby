@@ -1,8 +1,8 @@
-# AGENTS.md — hello_ruby Architecture Guide
+# AGENTS.md — Hello Ruby Architecture Guide
 
 ## Project Overview
 
-**hello_ruby** is a Ruby learning tutorial project that combines the gem engineering patterns from **zenspace/ruby** with the tiered learning structure from **hello-rust**. It provides a comprehensive set of runnable examples and tutorials for learning Ruby from basic syntax to production-grade applications.
+**Hello Ruby** is a Ruby learning tutorial project that combines the gem engineering patterns from **zenspace/ruby** with the tiered learning structure from **hello-rust**. It provides a comprehensive set of runnable examples and tutorials for learning Ruby from basic syntax to production-grade applications.
 
 The project is structured as a standard Ruby gem with a CLI application, organized into three learning tiers: **Basic** → **Advance** → **Awesome**.
 
@@ -10,25 +10,25 @@ The project is structured as a standard Ruby gem with a CLI application, organiz
 
 ### Basic Tier (15 Topics)
 
-Beginner-friendly Ruby fundamentals. Each topic is a self-contained module in `lib/hello_ruby/basic/`.
+Beginner-friendly Ruby fundamentals. Each topic is a self-contained module in `lib/hello/basic/`.
 
 | # | Module | File | Status |
 |---|--------|------|--------|
-| 1 | Variables | `basic/variables.rb` | ✅ Initial |
-| 2 | Strings | `basic/strings.rb` | ✅ Initial |
-| 3 | Arrays | `basic/arrays.rb` | ✅ Initial |
-| 4 | Hashes | `basic/hashes.rb` | ✅ Initial |
-| 5 | Control Flow | `basic/control_flow.rb` | ✅ Initial |
-| 6 | Methods | `basic/methods.rb` | ✅ Initial |
-| 7 | Classes | `basic/classes.rb` | ✅ Initial |
-| 8 | Modules | `basic/modules.rb` | ✅ Initial |
-| 9 | Blocks & Procs | `basic/blocks_procs.rb` | ✅ Initial |
-| 10 | File I/O | `basic/file_io.rb` | ✅ Initial |
-| 11 | Exceptions | `basic/exceptions.rb` | ✅ Initial |
-| 12 | Numbers | `basic/numbers.rb` | ✅ Initial |
-| 13 | Symbols | `basic/symbols.rb` | ✅ Initial |
-| 14 | Regular Expressions | `basic/regex.rb` | ✅ Initial |
-| 15 | File Management | `basic/file_management.rb` | ✅ Initial |
+| 1 | Variables | `basic/variables_sample.rb` | ✅ Initial |
+| 2 | Strings | `basic/strings_sample.rb` | ✅ Initial |
+| 3 | Arrays | `basic/arrays_sample.rb` | ✅ Initial |
+| 4 | Hashes | `basic/hashes_sample.rb` | ✅ Initial |
+| 5 | Control Flow | `basic/control_flow_sample.rb` | ✅ Initial |
+| 6 | Methods | `basic/methods_sample.rb` | ✅ Initial |
+| 7 | Classes | `basic/classes_sample.rb` | ✅ Initial |
+| 8 | Modules | `basic/modules_sample.rb` | ✅ Initial |
+| 9 | Blocks & Procs | `basic/blocks_procs_sample.rb` | ✅ Initial |
+| 10 | File I/O | `basic/file_io_sample.rb` | ✅ Initial |
+| 11 | Exceptions | `basic/exceptions_sample.rb` | ✅ Initial |
+| 12 | Numbers | `basic/numbers_sample.rb` | ✅ Initial |
+| 13 | Symbols | `basic/symbols_sample.rb` | ✅ Initial |
+| 14 | Regular Expressions | `basic/regex_sample.rb` | ✅ Initial |
+| 15 | File Management | `basic/file_management_sample.rb` | ✅ Initial |
 
 ### Advance Tier (10 Topics)
 
@@ -180,7 +180,7 @@ end
 ```
 spec/
 ├── spec_helper.rb          # RSpec configuration
-├── hello_ruby_spec.rb      # Gem-level smoke tests
+├── hello_spec.rb      # Gem-level smoke tests
 ├── basic/                  # Basic tier tests
 │   ├── variables_spec.rb
 │   ├── strings_spec.rb
@@ -251,3 +251,10 @@ end
 8. **Use `dry-struct`** for configuration and data transfer objects
 9. **Use `dry-validation`** for input schemas
 10. **Follow the tier boundaries** — don't cross-pollinate concepts
+
+## Active Technologies
+- Ruby 3.2+ (rbenv managed, per .ruby-version) (001-hello-basic-tutorials)
+- SQLite3 (in-memory for examples, file-based for Awesome tier database simulations) (001-hello-basic-tutorials)
+
+## Recent Changes
+- 001-hello-basic-tutorials: Added Ruby 3.2+ (rbenv managed, per .ruby-version)

@@ -115,4 +115,4 @@ module Hello
   end
 end
 
-Hello::TopicRegistry.register("basic", "control_flow_sample", "控制流", Hello::Basic::ControlFlowSample)
+Hello::TopicRegistry.register("basic", "control_flow", "控制流", Hello::Basic::ControlFlowSample)

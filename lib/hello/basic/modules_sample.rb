@@ -114,4 +114,4 @@ module Hello
   end
 end
 
-Hello::TopicRegistry.register("basic", "modules_sample", "模块与混入", Hello::Basic::ModulesSample)
+Hello::TopicRegistry.register("basic", "modules", "模块与混入", Hello::Basic::ModulesSample)

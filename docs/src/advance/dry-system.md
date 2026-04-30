@@ -29,7 +29,7 @@ end
 
 容器定义了从哪里加载组件和如何加载。`component_dirs` 声明了组件所在的目录。每个目录可以有自己的注册规则，比如 `auto_register = true` 表示自动按命名约定注册。
 
-在 hello_ruby 项目中，容器已经定义好了。你可以在 Awesome 层看到完整的容器配置。
+在 Hello Ruby 项目中，容器已经定义好了。你可以在 Awesome 层看到完整的容器配置。
 
 ## 自动注册（Auto-registration）
 
@@ -131,7 +131,7 @@ end
 在实际项目中，你会把 Import 定义为项目的标准依赖注入方式：
 
 ```ruby
-# lib/hello_ruby/system/import.rb
+# lib/hello/system/import.rb
 module Hello
   module System
     module Import
@@ -171,12 +171,12 @@ end
 
 在测试中替换容器组件，你就不需要真正连接数据库或发送真实邮件。每个测试只验证当前类的逻辑，隔离了外部依赖。这是单元测试的核心原则。
 
-## 与 hello_ruby 项目的集成
+## 与 Hello Ruby 项目的集成
 
-在 hello_ruby 的 Awesome 层，dry-system 容器是整体架构的支柱：
+在 Hello Ruby 的 Awesome 层，dry-system 容器是整体架构的支柱：
 
 ```
-lib/hello_ruby/
+lib/hello/
 ├── system/
 │   ├── container.rb    → Application < Dry::System::Container
 │   ├── import.rb       → Application.injector
@@ -213,5 +213,5 @@ end
 - **Import mixin** 将容器中的组件以方法形式注入到类中
 - 依赖声明是显式的：`extend Import["key1", "key2"]` 清楚地列出依赖
 - 依赖注入让测试变得简单：用 test double 替换容器中的真实组件
-- 在 hello_ruby 项目中，Awesome 层使用 dry-system 构建完整的 DI 架构
+- 在 Hello Ruby 项目中，Awesome 层使用 dry-system 构建完整的 DI 架构
 - 运行 `hello advance dry_system` 查看完整 DI 模式演示

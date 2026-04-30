@@ -113,4 +113,4 @@ module Hello
   end
 end
 
-Hello::TopicRegistry.register("basic", "classes_sample", "类与对象", Hello::Basic::ClassesSample)
+Hello::TopicRegistry.register("basic", "classes", "类与对象", Hello::Basic::ClassesSample)

@@ -1,6 +1,6 @@
 # Thor CLI 高级用法
 
-hello_ruby 的命令行工具基于 Thor 构建。Thor 是 Ruby 生态中最流行的 CLI 框架之一，Rails 的命令行也是用 Thor 实现的。这一章带你深入了解 Thor 的高级功能，包括全局选项、命令专属选项、子命令注册、参数解析和自定义帮助。
+Hello Ruby 的命令行工具基于 Thor 构建。Thor 是 Ruby 生态中最流行的 CLI 框架之一，Rails 的命令行也是用 Thor 实现的。这一章带你深入了解 Thor 的高级功能，包括全局选项、命令专属选项、子命令注册、参数解析和自定义帮助。
 
 掌握 Thor 后，你可以为自己的 Ruby 项目构建功能完整的命令行工具。运行 `hello advance cli_advanced` 可以查看完整演示代码。
 

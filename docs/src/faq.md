@@ -34,7 +34,7 @@ mise use ruby@3.2.1
 bundle exec hello version
 ```
 
-如果希望全局使用，可运行 `bundle binstubs hello_ruby` 创建 binstub。
+如果希望全局使用，可运行 `bundle binstubs hello` 创建 binstub。
 
 ## 学习相关
 

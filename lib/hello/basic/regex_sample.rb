@@ -119,4 +119,4 @@ module Hello
   end
 end
 
-Hello::TopicRegistry.register("basic", "regex_sample", "正则表达式", Hello::Basic::RegexSample)
+Hello::TopicRegistry.register("basic", "regex", "正则表达式", Hello::Basic::RegexSample)

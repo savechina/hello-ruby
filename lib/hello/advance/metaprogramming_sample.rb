@@ -4,7 +4,7 @@
 module Hello
   module Advance
     # 元编程 — define_method, method_missing, eval 的实战演示
-    class MetaprogrammingSample
+    module MetaprogrammingSample
       def self.run
         puts "=== 元编程 — 动态代码生成与执行 ==="
         puts

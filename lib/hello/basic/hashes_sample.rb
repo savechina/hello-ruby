@@ -98,4 +98,4 @@ module Hello
   end
 end
 
-Hello::TopicRegistry.register("basic", "hashes_sample", "哈希操作", Hello::Basic::HashesSample)
+Hello::TopicRegistry.register("basic", "hashes", "哈希操作", Hello::Basic::HashesSample)

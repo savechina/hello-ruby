@@ -103,4 +103,4 @@ module Hello
   end
 end
 
-Hello::TopicRegistry.register("basic", "strings_sample", "字符串操作", Hello::Basic::StringsSample)
+Hello::TopicRegistry.register("basic", "strings", "字符串操作", Hello::Basic::StringsSample)

@@ -81,4 +81,4 @@ module Hello
   end
 end
 
-Hello::TopicRegistry.register("basic", "variables_sample", "变量绑定与可变性", Hello::Basic::VariablesSample)
+Hello::TopicRegistry.register("basic", "variables", "变量绑定与可变性", Hello::Basic::VariablesSample)

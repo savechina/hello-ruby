@@ -187,7 +187,7 @@ gemspec
 ```ruby
 # hello.gemspec（核心部分）
 Gem::Specification.new do |spec|
-  spec.name          = "hello_ruby"
+  spec.name          = "hello"
   spec.version       = Hello::VERSION
   spec.required_ruby_version = ">= 3.2.0"
 

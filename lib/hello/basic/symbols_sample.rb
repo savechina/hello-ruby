@@ -110,4 +110,4 @@ module Hello
   end
 end
 
-Hello::TopicRegistry.register("basic", "symbols_sample", "符号（Symbol）", Hello::Basic::SymbolsSample)
+Hello::TopicRegistry.register("basic", "symbols", "符号（Symbol）", Hello::Basic::SymbolsSample)

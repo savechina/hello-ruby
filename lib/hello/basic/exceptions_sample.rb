@@ -108,4 +108,4 @@ module Hello
   end
 end
 
-Hello::TopicRegistry.register("basic", "exceptions_sample", "异常处理", Hello::Basic::ExceptionsSample)
+Hello::TopicRegistry.register("basic", "exceptions", "异常处理", Hello::Basic::ExceptionsSample)

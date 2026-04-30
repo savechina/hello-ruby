@@ -123,4 +123,4 @@ module Hello
   end
 end
 
-Hello::TopicRegistry.register("basic", "numbers_sample", "数字与数值运算", Hello::Basic::NumbersSample)
+Hello::TopicRegistry.register("basic", "numbers", "数字与数值运算", Hello::Basic::NumbersSample)

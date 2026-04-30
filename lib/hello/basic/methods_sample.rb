@@ -121,4 +121,4 @@ module Hello
   end
 end
 
-Hello::TopicRegistry.register("basic", "methods_sample", "方法定义与调用", Hello::Basic::MethodsSample)
+Hello::TopicRegistry.register("basic", "methods", "方法定义与调用", Hello::Basic::MethodsSample)

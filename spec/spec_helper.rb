@@ -13,7 +13,9 @@ if ENV["COVERAGE"]
   end
 end
 
+require "hello"
 require "factory_bot"
+require "hello"
 
 RSpec.configure do |config|
   # Disable RSpec exposing methods globally on `Module` and `main`

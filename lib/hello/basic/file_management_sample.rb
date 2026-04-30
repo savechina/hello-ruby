@@ -33,9 +33,9 @@ module Hello
         puts "2. Dir operations:"
         puts "   pwd: #{Dir.pwd}"
 
-        rb_dir = File.join(Hello::ROOT, "lib", "hello_ruby")
+        rb_dir = File.join(Hello::ROOT, "lib", "hello")
         rb_files = Dir.glob(File.join(rb_dir, "*.rb"))
-        puts "   .rb files in lib/hello_ruby: #{rb_files.length}"
+        puts "   .rb files in lib/hello: #{rb_files.length}"
 
         all_ruby = Dir.glob(File.join(rb_dir, "**", "*.rb"))
         puts "   All .rb (recursive): #{all_ruby.length}"
@@ -62,8 +62,8 @@ module Hello
         puts "   ascend: #{pn.ascend.to_a.inspect}"
 
         root = Pathname.new(".")
-        lib_path = root / "lib" / "hello_ruby.rb"
-        puts "   root / lib / hello_ruby.rb: #{lib_path}"
+        lib_path = root / "lib" / "hello.rb"
+        puts "   root / lib / hello.rb: #{lib_path}"
         puts "   exists?: #{lib_path.exist?}"
 
         readme = Pathname.new("README.md")
@@ -108,4 +108,4 @@ module Hello
   end
 end
 
-Hello::TopicRegistry.register("basic", "file_management_sample", "文件管理", Hello::Basic::FileManagementSample)
+Hello::TopicRegistry.register("basic", "file_management", "文件管理", Hello::Basic::FileManagementSample)

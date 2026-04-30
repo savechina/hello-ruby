@@ -107,4 +107,4 @@ module Hello
   end
 end
 
-Hello::TopicRegistry.register("basic", "arrays_sample", "数组操作", Hello::Basic::ArraysSample)
+Hello::TopicRegistry.register("basic", "arrays", "数组操作", Hello::Basic::ArraysSample)

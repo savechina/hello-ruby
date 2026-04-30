@@ -124,4 +124,4 @@ module Hello
   end
 end
 
-Hello::TopicRegistry.register("basic", "blocks_procs_sample", "代码块与过程", Hello::Basic::BlocksProcsSample)
+Hello::TopicRegistry.register("basic", "blocks_procs", "代码块与过程", Hello::Basic::BlocksProcsSample)

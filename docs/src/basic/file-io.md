@@ -29,7 +29,7 @@
 
 require "tempfile"
 
-tmp = Tempfile.new("hello_ruby_demo")
+tmp = Tempfile.new("hello_demo")
 content = "第一行\n第二行\n第三行\n"
 bytes_written = File.write(tmp.path, content)
 puts "写入 #{bytes_written} 字节"
@@ -94,8 +94,8 @@ puts "大小: #{path.size} 字节"
 
 ```ruby
 project_root = Pathname.new(".")
-lib_path = project_root / "lib" / "hello_ruby.rb"
-# → lib/hello_ruby.rb
+lib_path = project_root / "lib" / "hello.rb"
+# → lib/hello.rb
 ```
 
 ## Dir.glob — 文件模式匹配
