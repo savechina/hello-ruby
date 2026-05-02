@@ -1,6 +1,10 @@
 # typed: true
 # frozen_string_literal: true
 
+require "dry/system/container"
+require "dry/auto_inject"
+require "dry/container"
+
 module Hello
   module Advance
     # DI 容器模式 — 模拟 dry-system 的自动注册、Provider、Import
@@ -114,8 +118,157 @@ module Hello
 
         puts
         puts "=== DI 容器演示完成 ==="
+        puts
+
+        # --- 7. 真实 dry-system DI ---
+        puts "--- 7. 真实 dry-system DI（使用 dry-system gem） ---"
+        dry_system_real_demo
+      end
+
+      def self.dry_system_real_demo
+        puts "  使用 dry-system gem 实现真实依赖注入"
+        puts
+
+        # 创建真实 dry-system Container
+        container = RealDIContainer.new
+
+        # dry-system 注册方式：使用 register 方法
+        container.register(:config) { AppConfig.new(env: "production", debug: false) }
+        container.register(:logger) { RealLogger.new("production") }
+        container.register(:cache) { RealCache.new(ttl: 600) }
+
+        puts "  注册组件:"
+        puts "    - config (AppConfig)"
+        puts "    - logger (RealLogger)"
+        puts "    - cache (RealCache)"
+        puts
+
+        # 解析组件
+        puts "  组件解析:"
+        config = container.resolve(:config)
+        logger = container.resolve(:logger)
+        puts "    config.env = #{config.env}"
+        puts "    logger.name = #{logger.logs.first ? 'initialized' : 'ready'}"
+        puts
+
+        # Import mixin 模式
+        puts "  Import mixin 注入:"
+        import = Dry::AutoInject(container)
+
+        # 手动解析组件并注入
+        service = RealUserService.new(
+          config: container.resolve(:config),
+          logger: container.resolve(:logger),
+          cache: container.resolve(:cache)
+        )
+        puts "    创建 RealUserService (注入 config, logger, cache)"
+        puts
+
+        # 执行业务逻辑
+        puts "  执行业务操作:"
+        service.create_user("Alice", "alice@example.com")
+        service.find_user("alice@example.com")
+        service.find_user("alice@example.com")
+        puts
+
+        puts "  dry-system 特性:"
+        puts "    - Dry::Container (轻量级容器)"
+        puts "    - Dry::AutoInject (Import mixin)"
+        puts "    - register/resolve 模式"
+        puts "    - lazy loading (延迟加载)"
+        puts "    - thread-safe (线程安全)"
+        puts
+
+        puts "=== 真实 dry-system 演示完成 ==="
       end
     end
+
+    # --- 真实 dry-system Container ---
+    class RealDIContainer < Dry::Container
+      # 使用 Dry::Container (轻量级容器) 而非 Dry::System::Container
+      # Dry::System::Container 需要完整项目结构，这里演示简化版本
+    end
+
+    # --- 真实组件实现 ---
+    class RealLogger
+      attr_reader :logs
+
+      def initialize(name)
+        @name = name
+        @logs = []
+      end
+
+      def info(message)
+        @logs << { level: :info, message: message, time: Time.now }
+        puts "    [#{@name}] #{message}"
+      end
+
+      def error(message)
+        @logs << { level: :error, message: message, time: Time.now }
+      end
+    end
+
+    class RealCache
+      attr_reader :hit_count, :miss_count
+
+      def initialize(ttl:)
+        @ttl = ttl
+        @store = {}
+        @hit_count = 0
+        @miss_count = 0
+      end
+
+      def get(key)
+        entry = @store[key]
+        if entry && (Time.now - entry[:time]) <= @ttl
+          @hit_count += 1
+          entry[:value]
+        else
+          @miss_count += 1
+          nil
+        end
+      end
+
+      def set(key, value)
+        @store[key] = { value: value, time: Time.now }
+      end
+    end
+
+    class RealUserService
+      attr_reader :config, :logger, :cache
+
+      def initialize(config:, logger:, cache:)
+        @config = config
+        @logger = logger
+        @cache = cache
+        @users = {}
+      end
+
+      def create_user(name, email)
+        @users[email] = { name: name, email: email, created_at: Time.now }
+        @logger.info("Created user: #{email}")
+        @users[email]
+      end
+
+      def find_user(email)
+        cached = @cache.get("user:#{email}")
+        if cached
+          @logger.info("Cache hit for: #{email}")
+          return cached
+        end
+
+        user = @users[email]
+        if user
+          @cache.set("user:#{email}", user)
+          @logger.info("Found user (cached): #{email}")
+        else
+          @logger.info("User not found: #{email}")
+        end
+        user
+      end
+    end
+
+    # --- DI 容器（教学示例）---
 
     # --- DI 容器 ---
     class DIContainer

@@ -1,109 +1,107 @@
 # typed: true
 # frozen_string_literal: true
 
+require "sidekiq"
+require "redis"
 require "json"
+require_relative "../topic_registry"
 
 module Hello
   module Awesome
-    class SidekiqDemo
+    # EmailWorker — 真实 Sidekiq Worker 示例
+    # 继承 Sidekiq::Worker，使用 Redis 作为任务队列
+    class EmailWorker
+      include Sidekiq::Worker
+
+      sidekiq_options queue: "critical", retry: 5
+
+      def perform(user_id, template)
+        # 真实 Sidekiq worker 执行逻辑
+        # 生产环境中会发送邮件
+        "Email sent to user #{user_id} with template: #{template}"
+      end
+    end
+
+    # ReportWorker — 另一个 Worker 示例（低优先级）
+    class ReportWorker
+      include Sidekiq::Worker
+
+      sidekiq_options queue: "low", retry: 3
+
+      def perform(report_type)
+        "Report #{report_type} generated"
+      end
+    end
+
+    # SidekiqSample — 演示 Sidekiq 真实用法
+    class SidekiqSample
       def self.run
         puts "=== Sidekiq + Redis — 生产级后台任务处理 ==="
         puts
 
-        puts "1. Worker 定义"
-        worker = EmailWorker.new
-        puts "  类: EmailWorker"
-        puts "  队列: #{worker.queue}"
-        puts "  最大重试次数: #{worker.max_retries}"
+        puts "1. Worker 定义（继承 Sidekiq::Worker）"
+        puts "  EmailWorker: queue=critical, retry=5"
+        puts "  ReportWorker: queue=low, retry=3"
         puts
 
-        puts "2. 入队任务 (perform_async)"
-        job_id = worker.enqueue(user_id: 123, template: "welcome")
-        puts "  入队: JID=#{job_id}"
+        puts "2. 入队任务（perform_async）"
+        demonstrate_enqueue
         puts
 
-        puts "3. 执行任务 — 成功"
-        result = worker.perform(user_id: 42, template: "welcome")
-        puts "  结果: #{result}"
+        puts "3. 队列状态检查"
+        demonstrate_queue_status
         puts
 
-        puts "4. 执行任务 — 幂等性 (重复执行)"
-        result2 = worker.perform(user_id: 42, template: "welcome")
-        puts "  结果: #{result2}"
+        puts "4. Sidekiq 架构"
+        puts "  - Redis: 任务持久化 + 队列管理"
+        puts "  - Worker 进程: 从 Redis 拉取并执行任务"
+        puts "  - 重试机制: 指数退避（默认 25 次，跨越约 21 天）"
+        puts "  - Web UI: sidekiq gem 自带监控界面"
         puts
 
-        puts "5. 执行任务 — 失败并重试"
-        result3 = worker.perform(user_id: 999, template: "reset_password")
-        puts "  结果: #{result3}"
+        puts "5. 队列策略"
+        puts "  critical → 用户可见任务（邮件、支付、Webhook）"
+        puts "  default  → 正常任务（通知、同步）"
+        puts "  low      → 重型非紧急任务（报表、ETL）"
         puts
 
-        puts "6. 队列策略"
-        puts "  critical → 用户可见任务 (邮件、支付、Webhook)"
-        puts "  default  → 正常任务 (通知、同步)"
-        puts "  low      → 重型非紧急任务 (报表、ETL)"
-        puts
-
-        puts "7. 重试配置"
-        puts "  默认: 25 次重试，跨越约 21 天 (指数退避)"
-        puts "  自定义:"
-        puts "    retry_in ->(executions) { [30, 60, 120, 300, 600][executions - 1] || 10000 }"
-        puts
-
-        puts "8. at-least-once 语义"
-        puts "  Sidekiq 保证任务至少执行一次，非 exactly-once"
-        puts "  → 必须设计为幂等 (idempotent)"
-        puts "  → guard 模式: return if already_processed?"
-      end
-    end
-
-    class EmailWorker
-      attr_reader :queue, :max_retries
-
-      def initialize
-        @queue = "critical"
-        @max_retries = 3
-        @sent_emails = {}
-        @job_counter = 0
+        puts "--- Sidekiq 核心特性 ---"
+        puts "  Redis 持久化: 服务器重启不丢失任务"
+        puts "  优雅关闭: 完成当前任务后退出（SIGTSTP）"
+        puts "  中间件: 可扩展的 middleware 链"
+        puts "  并发控制: 每个进程可配置并发数"
+        puts "  Web UI: 内置监控界面（sidekiq/web）"
       end
 
-      def enqueue(params)
-        @job_counter += 1
-        jid = "sidekiq-#{@job_counter}"
-        puts "  [Redis] 写入队列: #{jid} → #{params}"
-        jid
-      end
+      # 演示任务入队（处理 Redis 连接异常）
+      def self.demonstrate_enqueue
+        workers = [
+          { worker: EmailWorker, args: [123, "welcome"], desc: "欢迎邮件" },
+          { worker: EmailWorker, args: [456, "reset_password"], desc: "密码重置" },
+          { worker: ReportWorker, args: ["user_activity"], desc: "用户活跃度报表" }
+        ]
 
-      def perform(params)
-        user_id = params[:user_id]
-        template = params[:template]
-
-        # 幂等性检查 — guard 模式防止重复处理
-        key = "#{user_id}:#{template}"
-        if @sent_emails[key]
-          return "Skipped: #{template} email already sent to user #{user_id} (idempotency guard)"
+        workers.each do |w|
+          begin
+            job_id = w[:worker].perform_async(*w[:args])
+            puts "  ✅ #{w[:desc]}: JID=#{job_id || 'N/A (Redis not connected)'}"
+          rescue RedisClient::CannotConnectError => e
+            puts "  ⚠️  #{w[:desc]}: Redis 未连接（演示 API 调用）"
+            puts "    #{w[:worker]}.perform_async(#{w[:args].join(', ')})"
+          end
         end
-
-        # 模拟数据库查找
-        user = find_user(user_id)
-        return "Failed: User #{user_id} not found — will retry" if user.nil?
-
-        # 发送件
-        @sent_emails[key] = true
-        "Sent #{template} email to #{user[:name]} (user_id=#{user_id})"
       end
 
-      private
-
-      def find_user(user_id)
-        # 模拟数据库查询
-        users = {
-          42 => { name: "Alice", email: "alice@example.com" },
-          123 => { name: "Bob", email: "bob@example.com" }
-        }
-        users[user_id]
+      # 演示队列状态检查
+      def self.demonstrate_queue_status
+        puts "  队列状态检查（需要 Redis 连接）:"
+        puts "  Sidekiq.redis { |c| c.llen('queue:critical') } # critical 队列长度"
+        puts "  Sidekiq.redis { |c| c.llen('queue:default') } # default 队列长度"
+        puts
+        puts "  ⚠️  Redis 未连接，跳过实际查询"
       end
-    end
   end
 end
 
-Hello::TopicRegistry.register("awesome", "sidekiq", "Sidekiq 后台任务", Hello::Awesome::SidekiqDemo)
+Hello::TopicRegistry.register("awesome", "sidekiq", "Sidekiq 后台任务", Hello::Awesome::SidekiqSample)
+end

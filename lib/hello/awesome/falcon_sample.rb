@@ -1,101 +1,127 @@
 # typed: true
 # frozen_string_literal: true
 
-require "json"
+require "falcon"
+require "rack/test"
+require_relative "../topic_registry"
 
 module Hello
   module Awesome
-    class FalconDemo
+    # FalconSample — 演示 Falcon 异步 HTTP 服务器
+    # Falcon 基于 Async gem，使用 Fiber 实现非阻塞 I/O
+    class FalconSample
       def self.run
         puts "=== Falcon — 高性能异步 Ruby Web 服务器 ==="
         puts
 
-        puts "1. 核心架构"
-        puts "  Falcon = 多进程 + 多 Fiber HTTP 服务器"
-        puts "  每个请求在轻量级 Fiber 中执行"
-        puts "  支持 HTTP/1.x + HTTP/2 + TLS 原生"
-        puts "  基于 async + async-http gem (Socketry 开发)"
+        # 使用 Rack::Test 测试 Falcon 兼容的 Rack 应用
+        client = Rack::Test::Session.new(Rack::MockSession.new(build_rack_app))
+
+        puts "1. Falcon 架构特点"
+        puts "  - 基于 Async gem + Fiber 实现异步 I/O"
+        puts "  - 每个请求在轻量级 Fiber 中执行"
+        puts "  - 支持 HTTP/1.x + HTTP/2 + TLS 原生"
+        puts "  - 多进程 + 事件驱动（类似 EventMachine）"
         puts
 
-        puts "2. Rack 兼容性"
-        config_ru = ->(env) { [200, { "Content-Type" => "text/plain" }, ["Hello Falcon!"]] }
-        status, headers, body = config_ru.call({ "REQUEST_METHOD" => "GET", "PATH_INFO" => "/" })
-        puts "  状态码: #{status}"
-        puts "  响应头: #{headers}"
-        puts "  响应体: #{body.first}"
+        puts "2. Rack 兼容应用（可被 Falcon 服务）"
+        client.get "/"
+        puts "  响应: #{client.last_response.body}"
+        puts "  状态码: #{client.last_response.status}"
         puts
 
-        puts "3. 快速启动"
-        puts "  $ gem install falcon"
-        puts "  $ falcon serve --bind https://localhost:9292"
-        puts "  → 自动生成自签名 TLS 证书"
-        puts "  → 支持 HTTP/2 多路复用"
+        puts "3. JSON API 端点"
+        client.get "/api/status"
+        puts "  响应: #{client.last_response.body}"
+        puts "  状态码: #{client.last_response.status}"
         puts
 
-        puts "4. 与 Sinatra 集成"
-        puts "  # 在 Gemfile 中:"
-        puts "  # gem 'falcon'"
-        puts "  # gem 'sinatra'"
-        puts
-        puts "  # config.ru:"
-        puts "  require 'sinatra'"
-        puts "  get('/') { 'Served by Falcon!' }"
-        puts "  run Sinatra::Application"
-        puts
-        puts "  $ bundle exec falcon serve"
-        puts "  → 使用 Fiber 调器替代 Puma 的线程池"
+        puts "4. 路由参数示例"
+        client.get "/users/42"
+        puts "  响应: #{client.last_response.body}"
+        puts "  状态码: #{client.last_response.status}"
         puts
 
-        puts "5. WebSocket 支持"
-        ws_app = WebSocketApp.new
-        puts "  WS 连接: #{ws_app.connect}"
-        puts "  客户端发送: #{ws_app.send_message("Hello!")}"
-        puts "  服务器响应: #{ws_app.receive}"
+        puts "5. 异步行为演示（Fiber 非阻塞）"
+        puts "  Falcon 使用 Async gem 实现真正的非阻塞 I/O"
+        puts "  以下代码展示了 Async 块的使用："
+        puts
+        demo_async_behavior
         puts
 
-        puts "6. 性能对比 (请求/秒, 100 并发)"
-        puts "  框架       | Falcon | Puma  | Webrick"
-        puts "  HTTP/1     | 8500   | 4200  | 800"
-        puts "  HTTP/2     | 12000  | N/A   | N/A"
-        puts "  WebSocket  | 5000   | N/A   | N/A"
+        puts "6. Falcon 服务器配置（生产环境）"
+        puts "  # config.ru"
+        puts "  require 'falcon'"
+        puts "  app = proc { |env| [200, { 'Content-Type' => 'text/plain' }, ['Hello from Falcon!']] }"
+        puts "  run Falcon::Server.new(app)"
+        puts
+        puts "  $ falcon serve --bind http://localhost:9292"
+        puts "  → 自动使用所有 CPU 核心（多进程）"
+        puts "  → 每个请求在独立 Fiber 中处理"
         puts
 
-        puts "7. 部署"
-        puts "  systemd:  --forked (多进程)"
-        puts "  Kubernetes: --threaded (单进程多线程)"
-        puts "  并发模型: Fiber (非 OS 线程) - 可同时处理上千连接"
-        puts
-
-        puts "8. 何时选择 Falcon"
-        puts "  ✅ 高并发 API (需要最大吞吐量)"
-        puts "  ✅ 实时应用 (WebSockets, SSE)"
-        puts "  ✅ Ruby 3.0+ (利用 fiber scheduling)"
-        puts "  ❌ 简单 Rails 应用 → Puma（默认，更成熟）"
-        puts "  ❌ 需要广泛社区支持 → Puma"
-      end
-    end
-
-    class WebSocketApp
-      def initialize
-        @connected = false
-        @buffer = ""
+        puts "--- Falcon 核心特性 ---"
+        puts "  异步 I/O: Async gem + Fiber（非线程/进程）"
+        puts "  HTTP/2: 原生支持多路复用（一个 TCP 连接多请求）"
+        puts "  TLS: 自动生成自签名证书（开发环境）"
+        puts "  与 Sinatra 集成: 直接 serve Sinatra::Base 应用"
+        puts "  WebSocket: 基于 Async::WebSocket 支持"
       end
 
-      def connect
-        @connected = true
-        "WebSocket connected to ws://localhost:9292/ws"
+      # 构建一个简单的 Rack 应用（兼容 Falcon）
+      def self.build_rack_app
+        lambda do |env|
+          req = Rack::Request.new(env)
+
+          case req.path
+          when "/"
+            [200, { "Content-Type" => "text/plain" }, ["Hello from Falcon-compatible Rack app!"]]
+          when "/api/status"
+            [200, { "Content-Type" => "application/json" }, [{ status: "ok", server: "Falcon" }.to_json]]
+          when %r{^/users/(\d+)$}
+            user_id = Regexp.last_match(1)
+            [200, { "Content-Type" => "application/json" }, [{ id: user_id, name: "User #{user_id}" }.to_json]]
+          else
+            [404, { "Content-Type" => "application/json" }, [{ error: "Not found" }.to_json]]
+          end
+        end
       end
 
-      def send_message(msg)
-        @buffer = msg
-        "Sent: #{msg} (#{msg.bytesize} bytes)"
-      end
+      # 演示 Async gem 的异步行为（Falcon 的核心）
+      def self.demo_async_behavior
+        puts "  Async 块启动："
+        puts "  Async do"
+        puts "    puts \"Start #{Time.now}\""
+        puts "    await Async { sleep 1; puts \"Task 1 done #{Time.now}\" }"
+        puts "    await Async { sleep 1; puts \"Task 2 done #{Time.now}\" }"
+        puts "    puts \"End #{Time.now}\""
+        puts "  end"
+        puts
+        puts "  执行结果（并发执行，总耗时 ~1s 而非 2s）:"
+        puts "  Start -> Task 1 & Task 2 并发 -> End"
 
-      def receive
-        @connected ? "Echo: #{@buffer}" : "Not connected"
+        # 实际执行演示
+        start = Time.now
+        Async do
+          task1 = Async do
+            sleep 0.5
+            puts "    [Fiber] Task 1 completed (concurrent)"
+          end
+
+          task2 = Async do
+            sleep 0.5
+            puts "    [Fiber] Task 2 completed (concurrent)"
+          end
+
+          task1.wait
+          task2.wait
+        end
+
+        elapsed = (Time.now - start).round(2)
+        puts "    实际耗时: #{elapsed}s（证明非阻塞）"
       end
     end
   end
 end
 
-Hello::TopicRegistry.register("awesome", "falcon", "Falcon 异步服务器", Hello::Awesome::FalconDemo)
+Hello::TopicRegistry.register("awesome", "falcon", "Falcon 异步服务器", Hello::Awesome::FalconSample)

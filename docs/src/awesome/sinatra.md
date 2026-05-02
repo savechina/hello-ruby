@@ -9,6 +9,20 @@
 - **微服务友好**：轻量级，适合构建独立的小服务
 - **易于理解**：没有 Rails 那样的魔法层，请求到响应的流程一目了然
 
+## 运行示例
+
+本章节的代码可以通过 CLI 运行完整演示：
+
+```bash
+hello awesome sinatra  # 查看 Sinatra REST API 完整演示
+```
+
+演示包含两部分：
+1. **真实 Sinatra REST API**（Section 1）：RealTaskAPI - Sinatra::Base + Sequel + Rack::Test，生产级用法参考（推荐）
+2. **内存模拟**（Section 2）：MemoryTaskStore + TaskApp 展示 REST API 内部实现模式，理解 Sinatra 路由原理
+
+建议先运行演示代码，再看文档理解原理。
+
 ## 第一个 Sinatra 应用
 
 ```ruby

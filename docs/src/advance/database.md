@@ -6,6 +6,20 @@
 
 运行 `hello advance database` 可以查看完整演示代码。
 
+## 运行示例
+
+本章节的代码可以通过 CLI 运行完整演示：
+
+```bash
+hello advance database  # 查看 Sequel ORM 完整演示
+```
+
+演示包含两部分：
+1. **内存模拟**（Section 1-6）：MemoryDatabase 展示 ORM 内部实现模式，帮助理解 Ruby 如何封装数据库操作
+2. **真实 Sequel**（Section 7）：Sequel.sqlite + Schema + CRUD + 查询链 + 事务，生产级用法参考
+
+建议先运行演示代码，再看文档理解原理。
+
 ## 数据库连接
 
 ORM 的第一步是建立与数据库的连接。Sequel 支持 SQLite、PostgreSQL、MySQL、MSSQL 等多种数据库，连接接口一致：

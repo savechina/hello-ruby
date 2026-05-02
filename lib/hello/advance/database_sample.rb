@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require "json"
+require "sequel"
 
 module Hello
   module Advance
@@ -117,10 +118,128 @@ module Hello
 
         puts
         puts "=== ORM 演示完成 ==="
+        puts
+
+        # --- 7. Sequel/SQLite3 真实数据库 ---
+        puts "--- 7. Sequel/SQLite3 真实数据库 ---"
+        sequel_demo
+      end
+
+      def self.sequel_demo
+        puts "  使用 Sequel ORM + SQLite3 内存数据库"
+        puts
+
+        # 创建内存数据库连接
+        db = Sequel.sqlite
+
+        # Schema 定义
+        db.create_table :users do
+          primary_key :id
+          String :name, null: false
+          String :email, unique: true
+          Integer :age
+          TrueClass :active, default: true
+          DateTime :created_at
+        end
+
+        db.create_table :posts do
+          primary_key :id
+          String :title, null: false
+          Text :content
+          foreign_key :user_id, :users
+          TrueClass :published, default: false
+          DateTime :created_at
+        end
+
+        puts "  表结构:"
+        db.tables.each do |table_name|
+          columns = db.schema(table_name).map { |c| "#{c.first}:#{c.last[:type]}" }.join(", ")
+          puts "    #{table_name}(#{columns})"
+        end
+        puts
+
+        # CRUD 操作
+        puts "  --- CRUD 操作 ---"
+        users = db[:users]
+        user1 = users.insert(name: "Alice", email: "alice@example.com", age: 30)
+        user2 = users.insert(name: "Bob", email: "bob@example.com", age: 25)
+        user3 = users.insert(name: "Carol", email: "carol@example.com", age: 35, active: false)
+
+        puts "  INSERT 3 条用户记录: #{users.count} 条"
+        puts "    #{users.where(id: user1).first}"
+        puts "    #{users.where(id: user2).first}"
+        puts "    #{users.where(id: user3).first}"
+
+        posts = db[:posts]
+        posts.insert(title: "Ruby Tutorial", content: "Learn Ruby...", user_id: user1, published: true)
+        posts.insert(title: "Metacode", content: "Meta magic...", user_id: user1, published: true)
+        posts.insert(title: "Draft", content: "WIP", user_id: user2, published: false)
+
+        puts "  INSERT 3 篇文章: #{posts.count} 条"
+        puts
+
+        # 链式查询
+        puts "  --- 链式查询 ---"
+        results = users.where(active: true).order(:name).all
+        puts "  活跃用户按名字排序:"
+        results.each { |u| puts "    #{u[:name]} (age: #{u[:age]})" }
+
+        results = users.where { age > 28 }.select(:name, :age).all
+        puts "  age > 28 (仅 name, age):"
+        results.each { |u| puts "    #{u[:name]}, #{u[:age]}" }
+
+        count = users.where(active: true).count
+        puts "  活跃用户数: #{count}"
+        puts
+
+        # 关联查询
+        puts "  --- 关联查询 ---"
+        user_posts = posts.where(user_id: user1, published: true).order(:title).all
+        puts "  Alice 的已发表文章:"
+        user_posts.each { |p| puts "    #{p[:title]}" }
+
+        posts_with_users = posts.join(:users, id: :user_id).select(Sequel[:posts][:title], Sequel[:users][:name]).all
+        puts "  文章 + 作者 (join):"
+        posts_with_users.each do |row|
+          puts "    '#{row[:title]}' by #{row[:name]}"
+        end
+        puts
+
+        # 聚合
+        puts "  --- 聚合操作 ---"
+        avg_age = users.where(active: true).avg(:age)
+        puts "  活跃用户平均年龄: #{avg_age.round(2)}"
+
+        max_age = users.max(:age)
+        puts "  最大年龄: #{max_age}"
+
+        posts_per_user = posts.group_and_count(:user_id).all
+        puts "  每用户文章数: #{posts_per_user.inspect}"
+        puts
+
+        # 事务
+        puts "  --- 事务 ---"
+        db.transaction do
+          users.insert(name: "Eve", email: "eve@example.com", age: 28)
+          users.insert(name: "Frank", email: "frank@example.com", age: 32)
+        end
+        puts "  事务提交成功: #{users.count} users"
+
+        begin
+          db.transaction do
+            users.insert(name: "Grace", email: "grace@example.com", age: 29)
+            raise Sequel::Rollback
+          end
+        rescue Sequel::Rollback
+          puts "  事务回滚: 仍然 #{users.count} users"
+        end
+
+        puts
+        puts "=== Sequel 真实数据库演示完成 ==="
       end
     end
 
-    # --- 内存数据库引擎 ---
+    # --- 内存数据库引擎（教学示例）---
     class MemoryDatabase
       def initialize
         @tables = {}

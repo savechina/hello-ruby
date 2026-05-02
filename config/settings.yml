@@ -4,4 +4,4 @@ log_level: info
 
 database:
   adapter: sqlite3
-  database: db/hello_ruby.sqlite3
+  database: data/hello.sqlite3

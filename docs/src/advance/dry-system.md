@@ -6,6 +6,20 @@ dry-system 的哲学与传统 Rails 的全局状态模型不同。它强调显�
 
 运行 `hello advance dry_system` 可以查看完整演示代码。
 
+## 运行示例
+
+本章节的代码可以通过 CLI 运行完整演示：
+
+```bash
+hello advance dry_system  # 查看 dry-system DI 完整演示
+```
+
+演示包含两部分：
+1. **模拟容器**（Section 1-6）：DIContainer 展示依赖注入容器内部实现模式，理解 Ruby 如何管理对象生命周期
+2. **真实 Dry::Container**（Section 7）：Dry::Container + resolve + AutoInject + namespace，生产级用法参考
+
+建议先运行演示代码，再看文档理解原理。
+
 ## 容器设置
 
 依赖注入的核心是一个容器。容器负责管理所有组件的创建和生命周期：

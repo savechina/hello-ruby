@@ -1,163 +1,130 @@
 # typed: true
 # frozen_string_literal: true
 
-require "json"
+require "hanami"
+require "dry-validation"
+require "dry-struct"
+require_relative "../topic_registry"
 
 module Hello
   module Awesome
-    class HanamiDemo
+    # Types module for dry-struct
+    module Types
+      include Dry.Types
+    end
+    # HanamiSample — 演示 Hanami 2.0+ 架构
+    # Hanami 2.0+ 是模块化框架，组件可独立使用
+    class HanamiSample
       def self.run
         puts "=== Hanami — 干净架构的现代 Ruby 框架 ==="
         puts
 
-        repo = TaskRepository.new
+        puts "1. Hanami 2.0+ 架构特点"
+        puts "  - 模块化: 每个组件可独立使用（Entity、Repository、Action）"
+        puts "  - 切片架构: 使用 Slice 组织代码（类似 Rails Engine）"
+        puts "  - 依赖注入: 通过 Provider 系统管理依赖"
+        puts "  - 零猴子补丁: 不修改核心类（与 Rails 不同）"
+        puts
 
-        puts "1. 创建实体 (Entity)"
-        task = Task.new(title: "Design API", status: "in_progress", priority: "high")
+        puts "2. 实体定义（使用 dry-struct，Hanami 推荐）"
+        task = Task.new(id: 1, title: "Design API", status: "in_progress", priority: "high")
         puts "  实体: #{task.title} [#{task.status}] priority=#{task.priority}"
-        puts "  pending? → #{task.pending?}"
-        puts "  important? → #{task.important?}"
         puts
 
-        puts "2. 保存到 Repository (Data Mapper 模式)"
-        saved = repo.create(task)
-        puts "  返回: id=#{saved.id}, title=#{saved.title}"
+        puts "3. 仓库模式（Repository 概念）"
+        repo = TaskRepository.new
+        repo.create(title: "Design API", status: "in_progress", priority: "high")
+        repo.create(title: "Write Tests", status: "pending", priority: "medium")
+        repo.create(title: "Deploy App", status: "done", priority: "low")
+
+        all = repo.all
+        puts "  所有任务:"
+        all.each { |t| puts "    [##{t.id}] #{t.title.ljust(20)} status=#{t.status.ljust(12)} priority=#{t.priority}" }
         puts
 
-        repo.create(Task.new(title: "Write Tests", status: "pending", priority: "medium"))
-        repo.create(Task.new(title: "Deploy App", status: "done", priority: "low"))
-        repo.create(Task.new(title: "Review PR", status: "in_progress", priority: "high"))
-
-        puts "3. 列出所有任务 (按优先级排序)"
-        all = repo.list
-        all.each { |t| puts "  [##{t.id}] #{t.title.ljust(20)} status=#{t.status.ljust(12)} priority=#{t.priority}" }
-        puts
-
-        puts "4. 过滤：查找高优先级任务"
-        urgent = repo.find_by_priority("high")
-        urgent.each { |t| puts "  #{t.title} (#{t.status})" }
-        puts
-
-        puts "5. 更新实体"
-        updated = repo.update(all[0].id, status: "done")
-        puts "  #{updated.title} → status=done"
-        puts
-
-        puts "6. 参数验证 (dry-validation 风格)"
+        puts "4. 参数验证（dry-validation 集成）"
         valid_params = { title: "New Feature", status: "pending", priority: "high" }
-        result = validate_params(valid_params)
-        puts "  有效参数: #{result[:valid]} → #{result[:errors]}"
-
-        invalid_params = { title: "", status: "unknown" }
-        result2 = validate_params(invalid_params)
-        puts "  无效参数: #{result2[:valid]} → #{result2[:errors]}"
+        contract = Class.new(Dry::Validation::Contract) do
+          params do
+            required(:title).value(:string)
+            required(:status).value(:string)
+            required(:priority).value(:string)
+          end
+        end.new
+        result = contract.call(valid_params)
+        puts "  参数: #{valid_params}"
+        puts "  验证结果: #{result.success? ? '✅ 通过' : '❌ 失败'}"
         puts
 
-        puts "7. View 层 — 数据格式化"
-        view = TaskIndexView.new(repo)
-        puts "  JSON: #{view.render_json}"
-        puts "  摘要: #{view.render_summary}"
+        puts "5. Hanami Slice 示例（应用组织）"
+        puts "  # 创建切片（类似微服务模块）"
+        puts "  class MyApp < Hanami::Slice"
+        puts "    # 自动加载 lib/ 目录"
+        puts "    # 配置 routes、providers、repositories"
+        puts "  end"
         puts
 
-        puts "--- 架构对比 ---"
-        puts "  维度       | Rails MVC        | Hanami 干净架构"
-        puts "  控制器     | Fat Controllers  | Thin Actions"
-        puts "  模型       | Active Record    | Data Mapper (Repository)"
-        puts "  数据传输   | AR objects        | Entity (纯 Ruby)"
-        puts "  验证       | Model callbacks   | dry-validation"
-        puts "  依赖注入   | 全局常量          | dry-system 容器"
-      end
-
-      def self.validate_params(params)
-        errors = []
-        errors << "title 不能为空" if params[:title].to_s.strip.empty?
-        errors << "status 必须是 pending/in_progress/done" unless %w[pending in_progress done].include?(params[:status])
-
-        { valid: errors.empty?, errors: errors }
+        puts "--- Hanami 核心特性 ---"
+        puts "  干净架构: Entity → Repository → Action → View"
+        puts "  依赖注入: Provider 系统（类似 dry-system）"
+        puts "  中间件: Rack 兼容的中间件栈"
+        puts "  命令行: `hanami new`、`hanami generate` 等"
+        puts "  dry-rb 集成: dry-validation、dry-types、dry-struct"
+        puts ""
+        puts "  ⚠️ 注意: 完整 Hanami 应用需要 `hanami new` 初始化"
+        puts "  本示例展示核心概念，实际开发请使用完整应用结构"
       end
     end
 
-    class Task
-      attr_reader :id, :title, :status, :priority, :created_at
-
-      def initialize(title:, status: "pending", priority: "low", id: nil, created_at: nil)
-        @id = id
-        @title = title
-        @status = status
-        @priority = priority
-        @created_at = created_at || Time.now
-      end
-
-      def pending?
-        @status == "pending"
-      end
-
-      def important?
-        @priority == "high"
-      end
+    # Task — 使用 dry-struct 作为实体（Hanami 推荐方式）
+    class Task < Dry::Struct
+      attribute :id, Types::Integer.optional
+      attribute :title, Types::Strict::String
+      attribute :status, Types::Strict::String
+      attribute :priority, Types::Strict::String
     end
 
+    # TaskRepository — 模拟 Hanami Repository 模式
+    # 真实 Hanami 应用: class TaskRepository < Hanami::Repository
     class TaskRepository
       def initialize
         @tasks = []
         @next_id = 1
       end
 
-      def list
-        @tasks.dup
-      end
-
-      def create(task)
-        new_task = Task.new(
-          title: task.title,
-          status: task.status,
-          priority: task.priority,
-          id: @next_id,
-          created_at: task.created_at
-        )
+      def create(attrs)
+        task = Task.new(attrs.merge(id: @next_id))
+        @tasks << task
         @next_id += 1
-        @tasks << new_task
-        new_task
+        task
       end
 
-      def update(id, params)
-        task = @tasks.find { |t| t.id == id }
-        return nil unless task
-        new_task = Task.new(
-          title: params[:title] || task.title,
-          status: params[:status] || task.status,
-          priority: params[:priority] || task.priority,
-          id: task.id,
-          created_at: task.created_at
-        )
-        @tasks[@tasks.index(task)] = new_task
-        new_task
+      def all
+        @tasks
       end
 
-      def find_by_priority(priority)
+      def by_status(status)
+        @tasks.select { |t| t.status == status }
+      end
+
+      def by_priority(priority)
         @tasks.select { |t| t.priority == priority }
-      end
-
-      def find(id)
-        @tasks.find { |t| t.id == id }
       end
     end
 
-    class TaskIndexView
-      def initialize(repo)
-        @repo = repo
-      end
+    # 参数验证（使用 dry-validation）
+    def self.validate_params(params)
+      contract = Class.new(Dry::Validation::Contract) do
+        params do
+          required(:title).value(:string)
+          required(:status).value(:string)
+          required(:priority).value(:string)
+        end
+      end.new
 
-      def render_json
-        @repo.list.map { |t| { title: t.title, status: t.status, priority: t.priority } }.to_json
-      end
-
-      def render_summary
-        tasks = @repo.list
-        "#{tasks.length} 个任务: #{tasks.count { |t| t.status == 'done' }} 完成, #{tasks.count { |t| t.status == 'pending' }} 待处理"
-      end
+      contract.call(params)
     end
   end
 end
 
-Hello::TopicRegistry.register("awesome", "hanami", "Hanami 干净架构", Hello::Awesome::HanamiDemo)
+Hello::TopicRegistry.register("awesome", "hanami", "Hanami 现代框架", Hello::Awesome::HanamiSample)

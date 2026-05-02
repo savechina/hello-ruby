@@ -14,6 +14,20 @@ Rails 在 2004 年重新定义了 Web 开发，但近二十年后，许多开发
 
 选择 Hanami 的场景：你正在构建一个中长期项目，团队规模在 3 人以上，需要清晰的代码结构和可测试性。选择 Rails 的场景：你需要在一周内搭出 MVP，或者团队中很多人已经熟悉 Rails 约定。
 
+## 运行示例
+
+本章节的代码可以通过 CLI 运行完整演示：
+
+```bash
+hello awesome hanami  # 查看 Hanami + dry-validation 完整演示
+```
+
+演示包含两部分：
+1. **内存模拟**（Section 1-7）：MemoryTaskStore 展示 Hanami Action 内部实现模式，理解 Ruby 如何分离业务逻辑
+2. **真实 dry-validation + Hanami**（Section 8）：dry-validation Schema + Hanami::Action patterns + params validation，生产级用法参考
+
+建议先运行演示代码，再看文档理解原理。
+
 ## 项目结构
 
 Hanami 生成的项目结构与 Rails 类似，但每个目录的职责更加明确：
