@@ -111,6 +111,9 @@ module Hello
         puts
         puts "  或使用 config.ru:"
         puts "    rackup config.ru -p 4567"
+
+        # 断开连接，避免 fork 时继承 writable connection
+        RealTaskAPI.disconnect_db
       end
 
       # 内存模拟 - 教学示例
@@ -167,16 +170,29 @@ module Hello
       set :port, 4567
       set :show_exceptions, false
 
-      # Sequel 数据库（内存 SQLite）
+      # Sequel 数据库（内存 SQLite）— lazy init for fork safety
       # 生产环境替换为: Sequel.connect(ENV['DATABASE_URL'])
-      DB = Sequel.sqlite
+      def self.db
+        @db ||= begin
+          db = Sequel.sqlite
+          db.create_table? :tasks do
+            primary_key :id
+            String :title, null: false
+            String :status, default: "pending"
+            DateTime :created_at
+          end
+          db
+        end
+      end
 
-      # 初始化数据库表
-      DB.create_table? :tasks do
-        primary_key :id
-        String :title, null: false
-        String :status, default: "pending"
-        DateTime :created_at
+      def self.disconnect_db
+        @db&.disconnect
+        @db = nil
+      end
+
+      def self.disconnect_db
+        @db&.disconnect
+        @db = nil
       end
 
       # 前置过滤器：设置 JSON 内容类型
@@ -186,13 +202,13 @@ module Hello
 
       # GET /api/tasks - 列出所有任务
       get "/api/tasks" do
-        tasks = DB[:tasks].all
+        tasks = RealTaskAPI.db[:tasks].all
         JSON.generate(tasks)
       end
 
       # GET /api/tasks/:id - 获取单个任务
       get "/api/tasks/:id" do
-        task = DB[:tasks].where(id: params[:id].to_i).first
+        task = RealTaskAPI.db[:tasks].where(id: params[:id].to_i).first
         if task
           JSON.generate(task)
         else
@@ -204,12 +220,12 @@ module Hello
       # POST /api/tasks - 创建任务
       post "/api/tasks" do
         data = JSON.parse(request.body.read)
-        task_id = DB[:tasks].insert(
+        task_id = RealTaskAPI.db[:tasks].insert(
           title: data["title"],
           status: data["status"] || "pending",
           created_at: Time.now
         )
-        task = DB[:tasks].where(id: task_id).first
+        task = RealTaskAPI.db[:tasks].where(id: task_id).first
         status 201
         JSON.generate(task)
       end
@@ -217,10 +233,10 @@ module Hello
       # PUT /api/tasks/:id - 更新任务
       put "/api/tasks/:id" do
         data = JSON.parse(request.body.read)
-        task = DB[:tasks].where(id: params[:id].to_i).first
+        task = RealTaskAPI.db[:tasks].where(id: params[:id].to_i).first
         if task
-          DB[:tasks].where(id: params[:id].to_i).update(data.slice("title", "status"))
-          updated = DB[:tasks].where(id: params[:id].to_i).first
+          RealTaskAPI.db[:tasks].where(id: params[:id].to_i).update(data.slice("title", "status"))
+          updated = RealTaskAPI.db[:tasks].where(id: params[:id].to_i).first
           JSON.generate(updated)
         else
           status 404
@@ -230,7 +246,7 @@ module Hello
 
       # DELETE /api/tasks/:id - 删除任务
       delete "/api/tasks/:id" do
-        count = DB[:tasks].where(id: params[:id].to_i).delete
+        count = RealTaskAPI.db[:tasks].where(id: params[:id].to_i).delete
         if count > 0
           JSON.generate(status: "deleted", count: count)
         else

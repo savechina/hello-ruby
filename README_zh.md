@@ -75,11 +75,17 @@ Ruby 核心语法和概念入门，适合初学者：
 | [performance.rb](docs/src/advance/performance.md) | 性能优化 | Benchmark、ObjectSpace、GC.stat、内存优化 |
 | [阶段复习](docs/src/advance/review-advance.md) | 高级复习 | 知识整合、服务设计练习 |
 
-### Awesome — 精选实战（生产级）
+### Awesome — 精选实战（生产级，5 个主题）
 
 生产环境级别的应用架构和工程实践：
 
-> 🔧 Awesome 层级内容正在建设中。完成后将涵盖：数据库高级应用、微服务架构、消息队列（Sidekiq）、模板引擎、Docker 部署等。
+| 模块 | 内容 | 核心技术 |
+|------|------|----------|
+| [Sinatra](docs/src/awesome/sinatra.md) | 轻量级 REST 微框架 | Sinatra::Base、Sequel ORM、Rack::Test CRUD |
+| [Hanami](docs/src/awesome/hanami.md) | 干净架构现代框架 | dry-struct 实体、Repository 模式、dry-validation |
+| [Grape](docs/src/awesome/grape.md) | REST API 专用框架 | 版本管理、参数验证、错误处理 |
+| [Sidekiq](docs/src/awesome/sidekiq.md) | 后台任务处理系统 | Worker 类、队列管理、重试策略 |
+| [Falcon](docs/src/awesome/falcon.md) | 高性能异步 Web 服务器 | Async/Fiber 并发、HTTP/2、Rack 兼容应用 |
 
 ## 🛠️ 技术栈
 

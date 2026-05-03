@@ -79,9 +79,17 @@ Deep dive into advanced Ruby features and ecosystem:
 | [Threads & Fibers](docs/src/advance/threads-fibers.md) | 线程与协程 | GVL, Queue, Mutex, Fiber.yield, Ractor messaging |
 | [Performance](docs/src/advance/performance.md) | 性能优化 | Benchmark, ObjectSpace, GC.stat, memory optimization |
 
-### Awesome — Production Grade (Coming Soon)
+### Awesome — Production Grade (5 Topics)
 
-> 🔧 Awesome tier content is under construction. Planned topics include: advanced database patterns, microservices architecture, message queues (Sidekiq), template engines, and Docker deployment.
+Real-world application patterns using industry-standard frameworks and tools:
+
+| Module | 模块 | Content | 内容 |
+|--------|------|---------|------|
+| [Sinatra](docs/src/awesome/sinatra.md) | 微框架 | Sinatra::Base REST API, Sequel ORM, Rack::Test CRUD |
+| [Hanami](docs/src/awesome/hanami.md) | 干净架构 | Entity (dry-struct), Repository pattern, dry-validation |
+| [Grape](docs/src/awesome/grape.md) | REST API | Versioned API, param validation, error handling |
+| [Sidekiq](docs/src/awesome/sidekiq.md) | 后台任务 | Worker classes, queue management, retry strategies |
+| [Falcon](docs/src/awesome/falcon.md) | 异步服务 | Async/Fiber concurrency, HTTP/2, Rack-compatible apps |
 
 ## 🛠️ Tech Stack
 

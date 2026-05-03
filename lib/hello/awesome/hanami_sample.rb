@@ -38,11 +38,22 @@ module Hello
         repo.create(title: "Deploy App", status: "done", priority: "low")
 
         all = repo.all
-        puts "  所有任务:"
+        puts "  所有任务 (#{repo.count} 条):"
         all.each { |t| puts "    [##{t.id}] #{t.title.ljust(20)} status=#{t.status.ljust(12)} priority=#{t.priority}" }
         puts
 
-        puts "4. 参数验证（dry-validation 集成）"
+        puts "4. 查询方法演示"
+        puts "  按状态筛选 (done): #{repo.by_status("done").map(&:title).join(", ")}"
+        puts "  按优先级筛选 (high): #{repo.by_priority("high").map(&:title).join(", ")}"
+
+        found = repo.find(2)
+        puts "  查找 ID=2: #{found ? found.title : "未找到"}"
+
+        repo.delete(3)
+        puts "  删除 ID=3 后剩余: #{repo.count} 条"
+        puts
+
+        puts "5. 参数验证（dry-validation 集成）"
         valid_params = { title: "New Feature", status: "pending", priority: "high" }
         contract = Class.new(Dry::Validation::Contract) do
           params do
@@ -56,7 +67,7 @@ module Hello
         puts "  验证结果: #{result.success? ? '✅ 通过' : '❌ 失败'}"
         puts
 
-        puts "5. Hanami Slice 示例（应用组织）"
+        puts "6. Hanami Slice 示例（应用组织）"
         puts "  # 创建切片（类似微服务模块）"
         puts "  class MyApp < Hanami::Slice"
         puts "    # 自动加载 lib/ 目录"
@@ -103,12 +114,32 @@ module Hello
         @tasks
       end
 
+      def find(id)
+        @tasks.find { |t| t.id == id }
+      end
+
       def by_status(status)
         @tasks.select { |t| t.status == status }
       end
 
       def by_priority(priority)
         @tasks.select { |t| t.priority == priority }
+      end
+
+      def count
+        @tasks.length
+      end
+
+      def delete(id)
+        before = @tasks.length
+        @tasks.reject! { |t| t.id == id }
+        @tasks.length < before
+      end
+
+      def where(attrs)
+        @tasks.select do |t|
+          attrs.all? { |k, v| t[k] == v }
+        end
       end
     end
 

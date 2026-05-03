@@ -236,6 +236,7 @@ module Hello
 
         puts
         puts "=== Sequel 真实数据库演示完成 ==="
+        db.disconnect
       end
     end
 

@@ -52,14 +52,18 @@ module Hello
         demonstrate_queue_status
         puts
 
-        puts "4. Sidekiq 架构"
+        puts "4. Worker 直接调用（模拟执行，无需 Redis）"
+        demonstrate_direct_perform
+        puts
+
+        puts "5. Sidekiq 架构"
         puts "  - Redis: 任务持久化 + 队列管理"
         puts "  - Worker 进程: 从 Redis 拉取并执行任务"
         puts "  - 重试机制: 指数退避（默认 25 次，跨越约 21 天）"
         puts "  - Web UI: sidekiq gem 自带监控界面"
         puts
 
-        puts "5. 队列策略"
+        puts "6. 队列策略"
         puts "  critical → 用户可见任务（邮件、支付、Webhook）"
         puts "  default  → 正常任务（通知、同步）"
         puts "  low      → 重型非紧急任务（报表、ETL）"
@@ -99,6 +103,26 @@ module Hello
         puts "  Sidekiq.redis { |c| c.llen('queue:default') } # default 队列长度"
         puts
         puts "  ⚠️  Redis 未连接，跳过实际查询"
+      end
+
+      # 演示 Worker 直接执行（模拟 Sidekiq 进程行为，无需 Redis）
+      def self.demonstrate_direct_perform
+        puts "  模拟 Sidekiq 进程从队列获取并执行任务:"
+        puts
+
+        email_worker = EmailWorker.new
+        result = email_worker.perform(789, "order_confirmation")
+        puts "  EmailWorker.perform(789, 'order_confirmation')"
+        puts "  → #{result}"
+        puts
+
+        report_worker = ReportWorker.new
+        result = report_worker.perform("monthly_summary")
+        puts "  ReportWorker.perform('monthly_summary')"
+        puts "  → #{result}"
+        puts
+        puts "  提示: 真实 Sidekiq 进程中, perform 由 worker 自动调用"
+        puts "  此处直接调用仅用于演示 Worker 内部逻辑"
       end
   end
 end
