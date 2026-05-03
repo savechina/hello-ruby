@@ -230,7 +230,11 @@ module Hello
         puts "  各类对象数量 Top 15:"
         counts = {}
         ObjectSpace.each_object { |obj|
-          klass = obj.class rescue Object
+          klass = begin
+            Object.instance_method(:class).bind_call(obj)
+          rescue
+            Object
+          end
           counts[klass.name || "<anonymous>"] ||= 0
           counts[klass.name || "<anonymous>"] += 1
         }
